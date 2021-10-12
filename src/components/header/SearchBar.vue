@@ -1,0 +1,71 @@
+<template>
+  <form class="searchbar" @submit.prevent="searchMovie">
+    <input
+      v-model.trim="searchKeyword"
+      type="text"
+      class="searchbar__input"
+      placeholder="영화를 검색하세요"
+    />
+    <button type="submit" class="searchbar__button">
+      <span class="searchbar__button__icon">🔍</span>
+    </button>
+  </form>
+</template>
+
+<script>
+export default {
+  data() {
+    return {
+      searchKeyword: '',
+    };
+  },
+  methods: {
+    async searchMovie() {
+      if (!this.searchKeyword) return;
+      this.$router.push(`/${this.searchKeyword}`);
+      this.$store.commit('assignState', { isLoading: true });
+      await this.$store.dispatch('getMovies', { keyword: this.searchKeyword });
+      this.$store.commit('assignState', { isLoading: false });
+    },
+  },
+};
+</script>
+
+<style lang="scss" scoped>
+.searchbar {
+  border-radius: 12px;
+  padding: 0 18px;
+  box-shadow: 0px 0.5rem 1.25rem rgb(0 0 0 / 16%);
+  &__input {
+    font-size: 18px;
+    width: 60vw;
+    height: 48px;
+    padding: 10px;
+    border: none;
+    &:focus {
+      outline: none;
+    }
+  }
+  &__button {
+    background: none;
+    border: none;
+    cursor: pointer;
+  }
+}
+
+@media screen and (min-width: $breakpoint-xl) and (min-width: $breakpoint-2xl - 1px) {
+  .searchbar {
+    &__input {
+      width: 33vw;
+    }
+  }
+}
+
+@media screen and (min-width: $breakpoint-2xl) {
+  .searchbar {
+    &__input {
+      width: 20vw;
+    }
+  }
+}
+</style>
