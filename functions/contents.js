@@ -1,7 +1,7 @@
+require('dotenv').config();
 const axios = require('axios');
 
-const BASE_URL = 'https://www.omdbapi.com';
-const API_KEY = '7035c60c';
+const { BASE_URL, API_KEY } = process.env;
 
 exports.handler = async function (event) {
   const options = JSON.parse(event.body);
