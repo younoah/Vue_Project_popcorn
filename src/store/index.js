@@ -24,10 +24,10 @@ export default createStore({
   actions: {
     async getMovies({ state, commit }, payload) {
       const { keyword, pageNumber = 1 } = payload;
-      const { Search: movies, totalResults } = await API.getMovies(
-        keyword,
-        pageNumber
-      );
+      const { Search: movies, totalResults } = await _request({
+        method: 'GET',
+        query: `&s=${keyword}&page=${pageNumber}`,
+      });
       if (!movies) {
         commit('assignState', {
           movies: [],
@@ -45,8 +45,11 @@ export default createStore({
       console.log('결과', state.movies);
     },
     async getMoreMovies({ state, commit }, payload) {
-      const { keyword, pageNumber = 1 } = payload;
-      const result = await API.getMovies(keyword, pageNumber);
+      const { keyword, pageNumber } = payload;
+      const result = await _request({
+        method: 'GET',
+        query: `&s=${keyword}&page=${pageNumber}`,
+      });
       const movies = result.Search;
       commit('assignState', {
         movies: [...state.movies, ...movies],
@@ -54,10 +57,20 @@ export default createStore({
       });
     },
     async getMovieDetail({ commit }, id) {
-      const currentMovie = await API.getMovieDetail(id);
+      const currentMovie = await _request({
+        method: 'GET',
+        query: `&i=${id}&plot=short`,
+      });
       commit('assignState', {
         currentMovie,
       });
     },
   },
 });
+
+async function _request(params) {
+  return await fetch('/.netlify/functions/contents', {
+    method: 'POST',
+    body: JSON.stringify(params),
+  }).then(res => res.json());
+}
